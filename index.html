@@ -238,15 +238,64 @@
         }
         .group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .group-header h3 { font-size: 1.05em; color: #3949ab; font-weight: 700; margin: 0; }
+        
+        /* === বাটন ডিজাইন (CSS) === */
         .group-actions {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr; /* ৩টি কলাম */
-            gap: 8px;
-            margin-top: 10px;
+            grid-template-columns: 1fr 1fr; /* ২ কলাম গ্রিড */
+            gap: 10px;
+            margin-top: 15px;
         }
-        .btn-add { background-color: #4CAF50; color: white; }
-        .btn-add.added { background-color: #e53935; }
-        .btn-buy-single { background-color: #ff9800; color: white; } 
+        
+        .action-button {
+            padding: 10px 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            color: white; /* ডিফল্ট টেক্সট কালার */
+        }
+        
+        /* প্রধান বাটন: কিনুন */
+        .btn-buy-single { 
+            background: linear-gradient(45deg, #ff9800, #e65100); 
+            color: white; 
+            grid-column: 1 / -1; /* সম্পূর্ণ প্রস্থ (Full width) */
+            font-size: 1em;
+            box-shadow: 0 4px 10px rgba(255, 152, 0, 0.4);
+        }
+        .btn-buy-single:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 152, 0, 0.6);
+        }
+
+        /* কার্ট বাটন */
+        .btn-add { 
+            background-color: #4CAF50; 
+            color: white; 
+        }
+        .btn-add.added { 
+            background-color: #e53935; /* যখন যোগ করা হয় */
+        }
+        
+        /* ডেমো বাটন */
+        .btn-demo {
+            background-color: #f1f5f9;
+            color: #3949ab;
+            border: 1px solid #e0e0e0;
+        }
+        .btn-demo:hover {
+            background-color: #e3f2fd;
+        }
+        /* === বাটন ডিজাইন পরিবর্তন শেষ === */
+
 
         /* ======================================= */
         /* নতুন পেমেন্ট গেটওয়ে স্টাইল */
@@ -329,7 +378,14 @@
             color: #e65100;
             font-weight: 600;
             margin-bottom: 20px;
+            text-align: left; /* লেখা বাম দিক থেকে শুরু */
         }
+        /* কার্টের গ্রুপের নাম দেখানোর জন্য স্টাইল */
+        #payment-summary-group-name {
+            font-weight: 700;
+            color: #c62828;
+        }
+
 
         /* ======================================= */
         /* রিভিউ কার্ড এবং মতামত বক্স স্টাইল */
@@ -579,6 +635,13 @@
             </div>
             
             <p class="copyright">© 2025 টেলিগ্রাম বাজার | সমস্ত অধিকার সংরক্ষিত।</p>
+            
+            <div id="visitor-counter-display" style="text-align: center; margin-top: 15px; font-size: 0.85em; color: var(--text-light);">
+                <i class="fas fa-eye"></i>
+                <span>পেজ ভিজিট: </span>
+                <span id="visit-counter-span" style="font-weight: 700;">0</span>
+            </div>
+
         </div>
 
         
@@ -623,7 +686,9 @@
 
         <div id="payment-step1-interface" class="hidden">
             <div class="payment-gateway-header">
-                <div class="logo">V-LINK</div> <h2 style="margin-top: 10px;">Secure Payment</h2>
+                <div class="logo">TG</div> 
+                <h2 style="margin-top: 10px; margin-bottom: 0;">TG Bazzar</h2>
+                <p style="margin-top: 5px; color: var(--text-light);">Secure Payment</p>
             </div>
             
             <div class="service-selection">
@@ -638,8 +703,8 @@
                 </div>
             </div>
             <div class="group-summary-payment">
-                <span>আপনি কিনছেন</span>: <span id="payment-summary-group-name"></span><br>
-                <span>মোট মূল্য</span>: <span id="payment-summary-price"></span> ৳
+                <span>আপনি কিনছেন:</span> <span id="payment-summary-group-name"></span><br>
+                <span>মোট মূল্য:</span> <span id="payment-summary-price"></span> ৳
             </div>
             
             <button class="back-link" id="payment-step1-back" onclick="handlePaymentBack()"><i class="fas fa-arrow-left"></i> <span>Back</span></button>
@@ -750,7 +815,8 @@
             HISTORY: 'telegramBazarHistory',
             USER_COUNT: 'telegramBazarUserCount',
             LANGUAGE: 'telegramBazarLanguage', 
-            CURRENT_INTERFACE: 'telegramBazarCurrentInterface' 
+            CURRENT_INTERFACE: 'telegramBazarCurrentInterface',
+            VISIT_COUNT: 'telegramBazarVisitCount' // 💡 নতুন ভিজিট কাউন্টার কী
         };
         
         // --- গ্রুপ ডেটা (৩০+ গ্রুপ) --- 
@@ -816,12 +882,13 @@
         let lastInterface = 'groups'; 
         let tempTransactionId = ''; 
         let tempPaymentMethod = ''; 
+        let pageVisits = 0; // 💡 নতুন ভিজিট কাউন্টার ভ্যারিয়েবল
         
         // DOM Element References (ফাঁকা রাখা হলো, window.onload এ সেট করা হবে)
         let interfaces, cartCountElement, groupListElement, certificateToDownload;
-        let userCountElement, pageInfo, prevButton, nextButton;
+        let userCountElement, pageInfo, prevButton, nextButton, visitCounterSpan;
 
-        // --- ইউজার কাউন্ট লজিক --- 
+        // --- ইউজার কাউন্ট লজিক (ফেইক, যেমন ছিল) --- 
         const USER_COUNT_KEY = 'telegramBazarUserCount';
         let currentCount = parseInt(localStorage.getItem(USER_COUNT_KEY)) || 10727; 
 
@@ -849,6 +916,10 @@
             const storedCount = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_COUNT);
             if (storedCount) { currentCount = parseInt(storedCount) || 10727; } else { saveUserCount(); }
             
+            // 💡 নতুন ভিজিট কাউন্টার লজিক
+            const storedVisits = localStorage.getItem(LOCAL_STORAGE_KEYS.VISIT_COUNT);
+            pageVisits = (parseInt(storedVisits) || 0) + 1; // প্রতিবার লোড হলে ১ যোগ হবে
+            localStorage.setItem(LOCAL_STORAGE_KEYS.VISIT_COUNT, pageVisits); // সাথে সাথে সেভ
         }
         
         function saveDataToLocalStorage() {
@@ -862,8 +933,7 @@
         // =======================================
         function hideAllInterfaces() { interfaces.forEach(el => el.classList.add('hidden')); }
         
-        // *** 💡 সমাধান এখানে করা হয়েছে ***
-        // এই ফাংশনটি এখন চেক করে যে প্রয়োজনীয় ডেটা আছে কিনা।
+        // *** 💡 রিলোড সমস্যার সমাধানসহ আপডেটেড ফাংশন ***
         function changeInterface(newInterfaceId, pushState = true, stateData = {}) {
             hideAllInterfaces();
             const element = document.getElementById(`${newInterfaceId}-interface`);
@@ -914,7 +984,18 @@
                         return; // এই ফাংশন থেকে বের হয়ে যান
                     }
                     
-                    document.getElementById('payment-summary-group-name').textContent = purchaseItem.name;
+                    // --- 💡 নতুন পরিবর্তন (কার্টের নাম দেখানো) ---
+                    const summaryNameEl = document.getElementById('payment-summary-group-name');
+                    if (purchaseItem.id === 'cart-combined' && cart.length > 0) {
+                        // কার্টের জন্য, গ্রুপের নামগুলো তালিকা আকারে দেখান
+                        const groupNames = cart.map(item => item.name).join(', ');
+                        summaryNameEl.innerHTML = `${purchaseItem.name} <br> <span style="font-size: 0.9em; color: #555;">(${groupNames})</span>`;
+                    } else {
+                        //单个 গ্রুপের জন্য শুধু নাম দেখান
+                        summaryNameEl.textContent = purchaseItem.name;
+                    }
+                    // --- পরিবর্তন শেষ ---
+
                     document.getElementById('payment-summary-price').textContent = purchaseItem.price.toLocaleString('bn-IN');
                     break;
                 
@@ -1048,12 +1129,14 @@
         // =======================================
         //          গ্রুপ রেন্ডারিং 
         // =======================================
+        
+        // === 💡 বাটন ডিজাইন পরিবর্তন (JavaScript) ===
         function createGroupCard(group) {
             const isAdded = cart.some(item => item.id === group.id);
             const addButtonClass = isAdded ? 'btn-add added' : 'btn-add';
             
             const btnCartText = isAdded ? '<i class="fas fa-minus-circle"></i> সরান' : '<i class="fas fa-cart-plus"></i> কার্টে যোগ';
-            const btnBuyText = '<i class="fas fa-bolt"></i> কিনুন';
+            const btnBuyText = '<i class="fas fa-bolt"></i> এখনই কিনুন';
             const btnDemoText = '<i class="fab fa-telegram-plane"></i> ডেমো';
             const videoCountLabel = 'ভিডিও সংখ্যা:';
 
@@ -1066,14 +1149,17 @@
                     </div>
                     <p style="font-size: 0.9em; color: #555; margin: 5px 0 10px 0;">${group.desc}</p>
                     <p style="font-size: 0.85em; color: #00897b; font-weight: 600;">${videoCountLabel} ${group.count}+</p>
+                    
                     <div class="group-actions">
-                        <button class="action-button ${addButtonClass}" onclick="addToCart(${group.id})">${btnCartText}</button>
                         <button class="action-button btn-buy-single" onclick="showPaymentInterface(allGroups.find(g => g.id === ${group.id}), 'groups')">${btnBuyText}</button>
+                        <button class="action-button ${addButtonClass}" onclick="addToCart(${group.id})">${btnCartText}</button>
                         <a href="${group.demoLink}" target="_blank" class="action-button btn-demo">${btnDemoText}</a>
                     </div>
                 </div>
             `;
         }
+        // === বাটন ডিজাইন পরিবর্তন শেষ ===
+        
         function displayGroups(groups, page) {
             groupListElement.innerHTML = '';
             const startIndex = (page - 1) * groupsPerPage;
@@ -1226,10 +1312,23 @@
             }
 
             const purchaseData = {
-                id: Date.now(), groupName: group.name, price: group.price, userName: userName,
-                telegramUsername: telegramUsername, transactionId: transactionId, verifyCode: verifyCode,
-                time: formattedTime, purchaseDate: new Date().toLocaleDateString('bn-IN')
+                id: Date.now(), 
+                groupName: group.name, // "কম্বো প্যাক (২ গ্রুপ)"
+                price: group.price, 
+                userName: userName,
+                telegramUsername: telegramUsername, 
+                transactionId: transactionId, 
+                verifyCode: verifyCode,
+                time: formattedTime, 
+                purchaseDate: new Date().toLocaleDateString('bn-IN')
             };
+            
+            // যদি কার্ট থেকে কেনা হয়, তাহলে groupName-এ গ্রুপের নামগুলোও যুক্ত করে দিন
+            if (group.id === 'cart-combined' && cart.length > 0) {
+                 const groupNames = cart.map(item => item.name).join(', ');
+                 purchaseData.groupName = `${group.name} (${groupNames})`;
+            }
+
 
             sendToTelegram(purchaseData); 
             
@@ -1385,10 +1484,18 @@
             cartTotalPrice.textContent = `৳ ${total.toLocaleString('bn-IN')}`;
         }
         function removeFromCart(groupId) { cart = cart.filter(item => item.id !== groupId); renderCart(); updateCartCount(); saveDataToLocalStorage(); }
+        
+        // কার্ট থেকে চেকআউট (অপরিবর্তিত, কারণ পরিবর্তনটি changeInterface ফাংশনে করা হয়েছে)
         function checkoutFromCart() {
             if (cart.length === 0) { alert("কার্টে কোনো গ্রুপ নেই!"); return; }
             const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
-            const combinedGroup = { id: 'cart-combined', name: `কম্বো প্যাক (${cart.length} গ্রুপ)`, price: totalAmount, demoLink: '#', desc: 'কার্টের সকল গ্রুপ একসাথে কেনা হচ্ছে।' };
+            const combinedGroup = { 
+                id: 'cart-combined', 
+                name: `কম্বো প্যাক (${cart.length} গ্রুপ)`, 
+                price: totalAmount, 
+                demoLink: '#', 
+                desc: 'কার্টের সকল গ্রুপ একসাথে কেনা হচ্ছে।' 
+            };
             showPaymentInterface(combinedGroup, 'cart'); 
             alert(`কম্বো মূল্য ৳ ${totalAmount.toLocaleString('bn-IN')}। এখন পেমেন্ট ফর্মে তথ্য দিন।`);
         }
@@ -1416,15 +1523,20 @@
             groupListElement = document.getElementById('group-list');
             certificateToDownload = document.getElementById('certificate-to-download');
             userCountElement = document.getElementById('user-count');
-            // welcomeModal ভ্যারিয়েবল এবং লজিক মুছে ফেলা হয়েছে
             pageInfo = document.getElementById('page-info');
             prevButton = document.getElementById('prev-button');
             nextButton = document.getElementById('next-button');
+            visitCounterSpan = document.getElementById('visit-counter-span'); // 💡 নতুন ভিজিট কাউন্টার ধরা
 
             // 2. Load Data
-            loadDataFromLocalStorage();
-            saveUserCount(); 
-            setInterval(updateAndIncrementUserCount, 5000); 
+            loadDataFromLocalStorage(); // এটি pageVisits ভ্যারিয়েবল সেট করে
+            saveUserCount(); // ফেইক কাউন্টার UI তে দেখায়
+            setInterval(updateAndIncrementUserCount, 5000); // ফেইক কাউন্টার বাড়ায়
+
+            // 💡 নতুন ভিজিট কাউন্টার UI তে সেট করা
+            if (visitCounterSpan) {
+                visitCounterSpan.textContent = pageVisits.toLocaleString('bn-IN');
+            }
             
             // 3. Hide all interfaces
             hideAllInterfaces();
@@ -1434,7 +1546,6 @@
             // `replaceState` ব্যবহার করা হচ্ছে যাতে পেজ লোড হিস্টরিতে এন্ট্রি না নেয়
             history.replaceState({ interfaceId: initialInterface }, '', `#${initialInterface}`);
             
-            // পপ-আপ লজিক মুছে ফেলা হয়েছে, সরাসরি ইন্টারফেস দেখানো হচ্ছে
             // এই ফাংশনটি এখন রিলোড সমস্যাটি স্বয়ংক্রিয়ভাবে সমাধান করবে
             changeInterface(initialInterface, false); 
         };
