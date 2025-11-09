@@ -511,85 +511,6 @@
         .btn-download-history { background-color: #039be5; color: white; }
         .btn-support { background-color: #e0f2f1; color: #00897b; }
 
-        /* সিম্পল পপ-আপ স্টাইল (সংশোধিত) */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7); 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000; 
-            backdrop-filter: blur(2px);
-        }
-
-        .modal-content {
-            background-color: #ffffff; 
-            padding: 25px 20px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 300px; 
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            transform: scale(0.95);
-            animation: fadeInScale 0.4s forwards; 
-            border: 3px solid #3949ab; 
-            overflow: hidden;
-        }
-        @keyframes fadeInScale { 100% { transform: scale(1); opacity: 1; } }
-
-        .modal-content .header-icon {
-            font-size: 2em; 
-            color: #d32f2f; 
-            margin-bottom: 10px;
-        }
-
-        .modal-content h3 {
-            color: #1a237e;
-            font-size: 1.4em; 
-            margin-bottom: 5px;
-            font-weight: 700;
-        }
-        .modal-content p {
-            color: #546e7a;
-            font-size: 0.9em; 
-            margin-bottom: 20px;
-            line-height: 1.4;
-        }
-        .modal-buttons {
-            display: grid; /* ১x২ গ্রিড লেআউট */
-            grid-template-columns: 1fr 1fr; 
-            gap: 10px;
-        }
-        .modal-btn {
-            width: 100%;
-            padding: 10px 15px; 
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-decoration: none;
-            box-sizing: border-box; /* Width ঠিক রাখার জন্য */
-        }
-        .btn-join {
-            background: linear-gradient(45deg, #00897b, #004d40); 
-            color: white;
-            box-shadow: 0 4px 10px rgba(0, 137, 123, 0.4);
-        }
-        .btn-close {
-            background-color: #eceff1;
-            color: #455a64;
-            border: 1px solid #cfd8dc;
-        }
-
         /* অন্যান্য প্রয়োজনীয় স্টাইল (অপরিবর্তিত) */
         .live-support-button {
             position: fixed;
@@ -631,23 +552,6 @@
 </head>
 <body data-lang="bn">
     
-    <div id="welcome-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="header-icon"><i class="fas fa-crown"></i></div>
-            <h3>প্রিমিয়াম অ্যাক্সেস</h3>
-            <p>আমাদের বিশেষ টেলিগ্রাম গ্রুপগুলোতে আপনাকে স্বাগতম! প্রিমিয়াম কন্টেন্টের জন্য এখনই জয়েন করুন।</p>
-            <div class="modal-buttons">
-                <a href="YOUR_TELEGRAM_GROUP_LINK_HERE" target="_blank" class="modal-btn btn-join">
-                    <i class="fab fa-telegram-plane"></i> <span>জয়েন করুন</span>
-                </a>
-                <button class="modal-btn btn-close" onclick="closeModal()">
-                    <i class="fas fa-times"></i> <span>কেটে দিন</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-
     <div class="container" id="main-container">
         
         <div id="main-interface" class="hidden">
@@ -724,16 +628,15 @@
             
             <div class="service-selection">
                 <div class="service-button" onclick="showPaymentInstructions('bkash')">
-                    <img src="https://i.ibb.co/B4x1f3N/bkash-logo.png" alt="Bkash">
+                    <h3 style="margin: 0; font-size: 1.2em; color: #d82a77;">বিকাশ</h3>
                 </div>
                 <div class="service-button" onclick="showPaymentInstructions('nagad')">
-                    <img src="https://i.ibb.co/yQc7d3H/nagad-logo.png" alt="Nagad">
+                    <h3 style="margin: 0; font-size: 1.2em; color: #e41f26;">নগদ</h3>
                 </div>
                 <div class="service-button" onclick="showPaymentInstructions('rocket')">
-                    <img src="https://i.ibb.co/k0gHp1x/rocket-logo.png" alt="Rocket">
+                    <h3 style="margin: 0; font-size: 1.2em; color: #8c3494;">রকেট</h3>
                 </div>
             </div>
-
             <div class="group-summary-payment">
                 <span>আপনি কিনছেন</span>: <span id="payment-summary-group-name"></span><br>
                 <span>মোট মূল্য</span>: <span id="payment-summary-price"></span> ৳
@@ -916,7 +819,7 @@
         
         // DOM Element References (ফাঁকা রাখা হলো, window.onload এ সেট করা হবে)
         let interfaces, cartCountElement, groupListElement, certificateToDownload;
-        let userCountElement, welcomeModal, pageInfo, prevButton, nextButton;
+        let userCountElement, pageInfo, prevButton, nextButton;
 
         // --- ইউজার কাউন্ট লজিক --- 
         const USER_COUNT_KEY = 'telegramBazarUserCount';
@@ -946,7 +849,6 @@
             const storedCount = localStorage.getItem(LOCAL_STORAGE_KEYS.USER_COUNT);
             if (storedCount) { currentCount = parseInt(storedCount) || 10727; } else { saveUserCount(); }
             
-            // ভাষা লোড করা বাদ দেওয়া হয়েছে
         }
         
         function saveDataToLocalStorage() {
@@ -960,6 +862,8 @@
         // =======================================
         function hideAllInterfaces() { interfaces.forEach(el => el.classList.add('hidden')); }
         
+        // *** 💡 সমাধান এখানে করা হয়েছে ***
+        // এই ফাংশনটি এখন চেক করে যে প্রয়োজনীয় ডেটা আছে কিনা।
         function changeInterface(newInterfaceId, pushState = true, stateData = {}) {
             hideAllInterfaces();
             const element = document.getElementById(`${newInterfaceId}-interface`);
@@ -972,9 +876,14 @@
                     history.pushState(state, '', `#${newInterfaceId}`);
                     localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_INTERFACE, newInterfaceId);
                 }
+            } else {
+                // যদি কোনো কারণে ইন্টারফেস খুঁজে না পায়, তবে মেইনে ফিরে যান
+                console.error(`Interface "${newInterfaceId}" not found. Redirecting to main.`);
+                changeInterface('main', false);
+                return;
             }
             
-            // স্পেসিফিক ইন্টারফেসের জন্য প্রয়োজনীয় ফাংশন কল করা (সংশোধিত)
+            // স্পেসিফিক ইন্টারফেসের জন্য প্রয়োজনীয় ফাংশন কল করা
             switch (newInterfaceId) {
                 case 'main': 
                     updateCartCount(); 
@@ -994,75 +903,94 @@
                 case 'review': 
                     renderReviews(); 
                     break; 
+                
+                // --- রিলোড সমস্যার সমাধান ---
                 case 'payment-step1':
-                    // ফিক্স: purchaseItem গ্লোবাল ভ্যারিয়েবল থেকে সেট করা হচ্ছে
-                    if (stateData.group) {
-                        purchaseItem = stateData.group; 
+                    if (stateData.group) { purchaseItem = stateData.group; }
+                    
+                    if (!purchaseItem) {
+                        console.warn("Payment-step1 loaded without purchaseItem. Redirecting to main.");
+                        changeInterface('main', false); // হোম পেজে রিডাইরেক্ট
+                        return; // এই ফাংশন থেকে বের হয়ে যান
                     }
-                    if (purchaseItem) {
-                        document.getElementById('payment-summary-group-name').textContent = purchaseItem.name;
-                        document.getElementById('payment-summary-price').textContent = purchaseItem.price.toLocaleString('bn-IN');
-                    }
+                    
+                    document.getElementById('payment-summary-group-name').textContent = purchaseItem.name;
+                    document.getElementById('payment-summary-price').textContent = purchaseItem.price.toLocaleString('bn-IN');
                     break;
-                case 'payment-step2':
-                     if (stateData.group) { purchaseItem = stateData.group; }
-                     if (purchaseItem) {
-                        // (এই পেজে কোনো ডাইনামিক ডেটা নেই)
-                     }
-                    break;
+                
                 case 'payment-step3':
                     if (stateData.group) { purchaseItem = stateData.group; } 
-                    if (stateData.method && purchaseItem) {
-                        tempPaymentMethod = stateData.method; // মেথড সেভ করা
-                        const method = stateData.method;
-                        const card = document.getElementById('payment-instruction-card');
-                        const title = document.getElementById('instruction-form-title');
-                        const dial = document.getElementById('instruction-dial-code');
-                        const numberEl = document.getElementById('instruction-number');
-                        const amountEl = document.getElementById('instruction-amount');
-                        const copyBtn = document.getElementById('instruction-copy-btn');
-                        
-                        card.className = 'payment-gateway-card'; // Reset class
-                        let numberToPay = '';
-
-                        if (method === 'bkash') {
-                            card.classList.add('theme-bkash');
-                            title.textContent = 'বিকাশ পেমেন্ট';
-                            dial.innerHTML = '<i class="fas fa-mobile-alt"></i> *247# ডায়াল করে আপনার BKASH মেনুতে যান।';
-                            numberToPay = '01336191739';
-                        } else if (method === 'nagad') {
-                            card.classList.add('theme-nagad');
-                            title.textContent = 'নগদ পেমেন্ট';
-                            dial.innerHTML = '<i class="fas fa-mobile-alt"></i> *167# ডায়াল করে আপনার NAGAD মেনুতে যান।';
-                            numberToPay = '01336191739';
-                        } else if (method === 'rocket') {
-                            card.classList.add('theme-rocket');
-                            title.textContent = 'রকেট পেমেন্ট';
-                            dial.innerHTML = '<i class="fas fa-mobile-alt"></i> *322# ডায়াল করে আপনার ROCKET মেনুতে যান।';
-                            numberToPay = '01614282989';
-                        }
-                        
-                        numberEl.textContent = numberToPay;
-                        copyBtn.onclick = () => copyToClipboard(numberToPay);
-                        amountEl.textContent = `৳${purchaseItem.price.toLocaleString('bn-IN')}`;
+                    
+                    if (!purchaseItem || !stateData.method) {
+                        console.warn("Payment-step3 loaded without data. Redirecting to main.");
+                        changeInterface('main', false);
+                        return;
                     }
+
+                    tempPaymentMethod = stateData.method;
+                    const method = stateData.method;
+                    const card = document.getElementById('payment-instruction-card');
+                    const title = document.getElementById('instruction-form-title');
+                    const dial = document.getElementById('instruction-dial-code');
+                    const numberEl = document.getElementById('instruction-number');
+                    const amountEl = document.getElementById('instruction-amount');
+                    const copyBtn = document.getElementById('instruction-copy-btn');
+                    
+                    card.className = 'payment-gateway-card'; // Reset class
+                    let numberToPay = '';
+
+                    if (method === 'bkash') {
+                        card.classList.add('theme-bkash');
+                        title.textContent = 'বিকাশ পেমেন্ট';
+                        dial.innerHTML = '<i class="fas fa-mobile-alt"></i> *247# ডায়াল করে আপনার BKASH মেনুতে যান।';
+                        numberToPay = '01336191739';
+                    } else if (method === 'nagad') {
+                        card.classList.add('theme-nagad');
+                        title.textContent = 'নগদ পেমেন্ট';
+                        dial.innerHTML = '<i class="fas fa-mobile-alt"></i> *167# ডায়াল করে আপনার NAGAD মেনুতে যান।';
+                        numberToPay = '01336191739';
+                    } else if (method === 'rocket') {
+                        card.classList.add('theme-rocket');
+                        title.textContent = 'রকেট পেমেন্ট';
+                        dial.innerHTML = '<i class="fas fa-mobile-alt"></i> *322# ডায়াল করে আপনার ROCKET মেনুতে যান।';
+                        numberToPay = '01614282989';
+                    }
+                    
+                    numberEl.textContent = numberToPay;
+                    copyBtn.onclick = () => copyToClipboard(numberToPay);
+                    amountEl.textContent = `৳${purchaseItem.price.toLocaleString('bn-IN')}`;
                     break;
+
                 case 'payment-step4':
                     if (stateData.group) { purchaseItem = stateData.group; } 
                     if (stateData.txnId) { tempTransactionId = stateData.txnId; } 
-                    break;
-                case 'success':
-                    if (stateData.purchaseData) {
-                        const data = stateData.purchaseData;
-                        document.getElementById('cert-name').textContent = data.userName;
-                        document.getElementById('cert-group').textContent = data.groupName;
-                        document.getElementById('cert-txnid').textContent = data.transactionId; 
-                        document.getElementById('cert-code').textContent = data.verifyCode;
-                        document.getElementById('cert-time').textContent = data.time;
-                        document.getElementById('cert-price').textContent = data.price.toLocaleString('bn-IN') + ' ৳';
+
+                    if (!purchaseItem || !tempTransactionId) {
+                        console.warn("Payment-step4 loaded without data. Redirecting to main.");
+                        changeInterface('main', false);
+                        return;
                     }
                     break;
+
+                case 'success':
+                    if (!stateData.purchaseData) {
+                        console.warn("Success page loaded without data. Redirecting to main.");
+                        changeInterface('main', false);
+                        return;
+                    }
+                    
+                    const data = stateData.purchaseData;
+                    document.getElementById('cert-name').textContent = data.userName;
+                    document.getElementById('cert-group').textContent = data.groupName;
+                    document.getElementById('cert-txnid').textContent = data.transactionId; 
+                    document.getElementById('cert-code').textContent = data.verifyCode;
+                    document.getElementById('cert-time').textContent = data.time;
+                    document.getElementById('cert-price').textContent = data.price.toLocaleString('bn-IN') + ' ৳';
+                    break;
+                // --- রিলোড সমস্যার সমাধান শেষ ---
+
                 default: 
+                    // যদি কোনো অজানা ইন্টারফেস আসে
                     changeInterface('main', false);
             }
         }
@@ -1101,18 +1029,12 @@
         }
         
         function handlePaymentBack() { window.history.back(); }
-        function closeModal() { welcomeModal.classList.add('hidden'); changeInterface('main'); }
+        // closeModal ফাংশন মুছে ফেলা হয়েছে
 
         // --- window.onpopstate: ব্যাক বাটন চাপলে কি হবে ---
         window.onpopstate = (event) => {
             // পেজ লোড হওয়ার সময় DOM elements রেডি নাও থাকতে পারে, তাই window.onload পর্যন্ত অপেক্ষা করুন
             if (!interfaces) return; 
-            
-            if (welcomeModal && !welcomeModal.classList.contains('hidden')) { 
-                closeModal(); 
-                history.pushState({ interfaceId: 'main' }, '', '#main');
-                return; 
-            }
 
             const state = event.state;
             if (state && state.interfaceId) {
@@ -1478,11 +1400,14 @@
             }); 
         }
         
+        // --- জেনারেটর ফাংশন (অপরিবর্তিত) ---
+        function generateUniqueCode() { return 'TB' + Math.floor(1000 + Math.random() * 9000); }
+
 
         // --- ইনিশিয়ালাইজেশন ---
         window.onload = () => { 
             // 1. DOM Elements Assign (সঠিক ইনিশিয়ালাইজেশন)
-            interfaces = ['main', 'groups', 'cart', 'payment-step1', 'payment-step2', 'payment-step3', 'payment-step4', 'success', 'history', 'review'].map(id => {
+            interfaces = ['main', 'groups', 'cart', 'payment-step1', 'payment-step3', 'payment-step4', 'success', 'history', 'review'].map(id => {
                 const el = document.getElementById(`${id}-interface`);
                 if (!el) console.error(`Error: Element #${id}-interface not found!`);
                 return el;
@@ -1491,7 +1416,7 @@
             groupListElement = document.getElementById('group-list');
             certificateToDownload = document.getElementById('certificate-to-download');
             userCountElement = document.getElementById('user-count');
-            welcomeModal = document.getElementById('welcome-modal');
+            // welcomeModal ভ্যারিয়েবল এবং লজিক মুছে ফেলা হয়েছে
             pageInfo = document.getElementById('page-info');
             prevButton = document.getElementById('prev-button');
             nextButton = document.getElementById('next-button');
@@ -1509,12 +1434,9 @@
             // `replaceState` ব্যবহার করা হচ্ছে যাতে পেজ লোড হিস্টরিতে এন্ট্রি না নেয়
             history.replaceState({ interfaceId: initialInterface }, '', `#${initialInterface}`);
             
-            if (!localStorage.getItem('telegramBazarFirstVisit')) {
-                welcomeModal.classList.remove('hidden');
-                localStorage.setItem('telegramBazarFirstVisit', 'false');
-            } else {
-                changeInterface(initialInterface, false); 
-            }
+            // পপ-আপ লজিক মুছে ফেলা হয়েছে, সরাসরি ইন্টারফেস দেখানো হচ্ছে
+            // এই ফাংশনটি এখন রিলোড সমস্যাটি স্বয়ংক্রিয়ভাবে সমাধান করবে
+            changeInterface(initialInterface, false); 
         };
 
     </script>
